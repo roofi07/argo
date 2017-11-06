@@ -6,6 +6,10 @@ import { AxHeaders } from './headers';
 
 @Injectable()
 export class SystemService {
+
+    private versionInfo: VersionInfo;
+    private versionInfoPromise;
+
     constructor(private http: Http) {
     }
 
@@ -22,8 +26,19 @@ export class SystemService {
     getVersion(): Observable<VersionInfo> {
         let customHeader = new Headers();
         customHeader.append('isUpdated', 'true');
-        return this.http.get(`v1/system/version`, { headers: customHeader })
-            .map(res => res.json());
+
+        if (this.versionInfo) {
+            return new Observable(observer => observer.next(this.versionInfo));
+        } else {
+            if (!this.versionInfoPromise) {
+                this.versionInfoPromise = this.http.get(`v1/system/version`, { headers: customHeader })
+                   .map(res => {
+                       this.versionInfo = res.json();
+                       return this.versionInfo;
+                   });
+            }
+            return this.versionInfoPromise;
+        }
     }
 
     getSpotInstanceConfig() {

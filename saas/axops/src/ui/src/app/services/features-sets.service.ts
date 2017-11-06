@@ -28,7 +28,7 @@ export class FeaturesSetsService {
                 });
                 return observer.next(flag);
             });
-        }).delay(200).first().toPromise();
+        }).first().toPromise();
     }
 }
 
